@@ -1,3 +1,4 @@
+
 import { authors , books ,BOOKS_PER_PAGE ,genres } from "./data.js";
 
 
@@ -16,7 +17,14 @@ const night = {
     light: '10, 10, 20',
 }
 
-
+/**
+ *
+ * @param {event} Object
+ *  This code defines a function toggleTheme and attaches
+ * an event listener to a button element. The toggleTheme function takes an
+ * event object as its parameter, and then it prevents the default behavior of
+ * the event using the preventDefault method.
+ */
 
 const toggleTheme = (event) => {
     event.preventDefault();
@@ -45,6 +53,7 @@ const toggleTheme = (event) => {
   saveButton.addEventListener('click', toggleTheme );
 
 
+//----------buttons , overlays and forms------------//
 const dataSearchFirstButton = document.querySelector('[data-header-search]')
 const dataSearchOverlay = document.querySelector('[data-search-overlay]')
 const dataHeaderSettingsButton = document.querySelector('[data-header-settings]')
@@ -56,12 +65,13 @@ const dataListButton = document.querySelector('[data-list-button]')
 const bookPreviewOverlay = document.querySelector('[data-list-active]')
 const dataSearchOverlayButton = document.querySelector("body > dialog:nth-child(4) > div > div > button.overlay__button.overlay__button_primary")
 
+//----------------------------------------------------//
 
 dataListButton.innerHTML = /* html */ [
      `<span>Show more</span>
      <span class="list__remaining">(${range - [page * BOOKS_PER_PAGE ]})</span>`,
  ]
- 
+ //---------------Event listeners and overlay displays------------------------//
  dataSearchFirstButton.addEventListener('click' , ()=>{
     dataSearchOverlay.style.display = 'block'
     bookPreviewOverlay.style.display = 'none'
@@ -85,7 +95,19 @@ const dataListCloseButton = document.querySelector('[data-list-close]')
       searchForm.style.display = ''
     })
   
-
+//-------------------------------------------------------------//
+/**
+ * The code sets up a function toggleTheme() that handles a click event on a
+   save button. The function toggleTheme() checks the value of a form field
+   called saveForm. If its value is 'day', it sets the color variables of the
+   document body to day theme, otherwise to night theme. It also hides an
+   overlay element. There are several event listeners that handle click events
+   on various buttons and overlays. For example, when the search button is
+   clicked, a search overlay is displayed, and the book preview overlay is
+   hidden. When the settings button is clicked, a settings overlay is displayed.
+   When the close button on the book preview overlay is clicked, the overlay is
+   hidden.
+ */
 document.querySelector('[data-list-button]').innerHTML = /**html */[
 
   `<span>Show more</span>
@@ -120,8 +142,9 @@ dataSettingsCancel.addEventListener('click' , ()=>{
  cancelSearchOverlayButton.addEventListener('click' , () =>{
    dataSearchOverlay.style.display = ''
  })
+//-----------------------------------------------------------------//
 
-
+//These are error checks to ensure that the books array and the range array are present and valid.
 
 if (!books && !Array.isArray(books)) {
     throw new Error('Source required')
@@ -130,7 +153,16 @@ if (!books && !Array.isArray(books)) {
 }
 
 
-
+/**
+ *
+ * @param {*} param0 
+ * @returns {preview}
+ * There is a dataListButton that displays a "Show more" button and the
+ * remaining number of items in the list. When the button is clicked, a
+ * dataListButton click event listener increments the page number and slices the
+ * books array to show more items. The newly added items are appended to the
+ * existing list of items, and the remaining count is updated accordingly.
+ */
 function createPreview({ author, id, image, title ,description ,published }) {
     const preview = document.createElement('div')
     preview.classList.add('preview')
@@ -188,7 +220,7 @@ for (const { author, image, title, id ,description ,published } of extracted  ) 
 const data_list = document.querySelector('[data-list-items]')
  data_list.appendChild(fragment)
 
-// data-list-items.appendChild(fragment)
+
 
 
 let genresFragment = document.createDocumentFragment()
@@ -226,11 +258,24 @@ for (let [id2, name2] of Object.entries(authors)) {
 const overlayFormAuthors = document.querySelector('[data-search-authors]')
 overlayFormAuthors.appendChild(authorsFragment)
 
-//const searchFormButton = document.querySelector("body > dialog:nth-child(4) > div > div > button.overlay__button.overlay__button_primary")
+//----------------------------------------------------------------------------------//
 
 
 
+/**
+ * This code is a search function that takes user input from a search form and
+   searches for books based on the title, author, and genre criteria. The
+   function uses the FormData object to retrieve the search criteria and then
+   iterates through the books array to find books that match the criteria.
 
+  The authors and genres objects are converted into arrays for better performance,
+  and the search criteria are matched against the values in these arrays.
+
+  If a book matches all of the search criteria, it is added to the result array.
+  The search results are then displayed in the HTML using the innerHTML property
+  of the resultList element. If no results are found, a message is displayed
+  instead.
+ */
 
 // Convert authors and genres objects into arrays for better performance
 const authorsArr = Object.entries(authors);
