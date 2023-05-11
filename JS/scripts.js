@@ -46,12 +46,9 @@ const toggleTheme = (event) => {
 
    
   };
-  
-  
-  
+
   const saveButton = document.querySelector("body > dialog:nth-child(5) > div > div > button.overlay__button.overlay__button_primary");
   saveButton.addEventListener('click', toggleTheme );
-
 
 //----------buttons , overlays and forms------------//
 const dataSearchFirstButton = document.querySelector('[data-header-search]')
@@ -59,19 +56,14 @@ const dataSearchOverlay = document.querySelector('[data-search-overlay]')
 const dataHeaderSettingsButton = document.querySelector('[data-header-settings]')
 const dataSettingsOverlay = document.querySelector('[data-settings-overlay]')
 const dataSettingsCancel = document.querySelector('[data-settings-cancel]')
-const searchOverlayCancelButton = document.querySelector('[data-search-cancel]');
 const cancelSearchOverlayButton = document.querySelector('[data-search-cancel]')
 const dataListButton = document.querySelector('[data-list-button]')
 const bookPreviewOverlay = document.querySelector('[data-list-active]')
 const dataSearchOverlayButton = document.querySelector("body > dialog:nth-child(4) > div > div > button.overlay__button.overlay__button_primary")
 
-//----------------------------------------------------//
 
-dataListButton.innerHTML = /* html */ [
-     `<span>Show more</span>
-     <span class="list__remaining">(${range - [page * BOOKS_PER_PAGE ]})</span>`,
- ]
- //---------------Event listeners and overlay displays------------------------//
+ //---------------Event listeners and overlay displays/overlay hiding------------------------//
+
  dataSearchFirstButton.addEventListener('click' , ()=>{
     dataSearchOverlay.style.display = 'block'
     bookPreviewOverlay.style.display = 'none'
@@ -92,22 +84,28 @@ const dataListCloseButton = document.querySelector('[data-list-close]')
     })
 
     dataSearchOverlayButton.addEventListener('click' , () =>{
-      searchForm.style.display = ''
+      dataSearchOverlay.style.display = 'none'
     })
   
 //-------------------------------------------------------------//
+
 /**
- * The code sets up a function toggleTheme() that handles a click event on a
-   save button. The function toggleTheme() checks the value of a form field
-   called saveForm. If its value is 'day', it sets the color variables of the
-   document body to day theme, otherwise to night theme. It also hides an
-   overlay element. There are several event listeners that handle click events
-   on various buttons and overlays. For example, when the search button is
-   clicked, a search overlay is displayed, and the book preview overlay is
-   hidden. When the settings button is clicked, a settings overlay is displayed.
-   When the close button on the book preview overlay is clicked, the overlay is
-   hidden.
+ * The first part of the code is updating an HTML element with the innerHTML
+   property to show a "Show more" button with a remaining book count. The second
+   part of the code is adding an event listener to the "Show more" button, which
+   increases the page count and extracts a subset of books from an array based
+   on the page count and displays them using the createPreview function. It also
+   updates the remaining book count dynamically based on the number of books
+   left to display.
+
+   The third part of the code includes event listener functions that are triggered
+   when certain buttons are clicked. For example, when the dataSearchFirstButton is
+   clicked, it displays a search overlay and hides the book preview overlay.
+   Similarly, when the dataHeaderSettingsButton is clicked, it displays a settings
+   overlay. Finally, there are two more event listeners for canceling search and
+   settings overlays.
  */
+
 document.querySelector('[data-list-button]').innerHTML = /**html */[
 
   `<span>Show more</span>
@@ -143,14 +141,6 @@ dataSettingsCancel.addEventListener('click' , ()=>{
    dataSearchOverlay.style.display = ''
  })
 //-----------------------------------------------------------------//
-
-//These are error checks to ensure that the books array and the range array are present and valid.
-
-if (!books && !Array.isArray(books)) {
-    throw new Error('Source required')
-}  if (!range && range.length < 2){
-     throw new Error('Range must be an array with two numbers')
-}
 
 
 /**
@@ -195,12 +185,13 @@ for (const { author, image, title, id ,description ,published } of extracted  ) 
     fragment.appendChild(preview)
     
     preview.addEventListener('click' ,(event) =>{
+      event.stopPropagation()   // stop bubbling
       const dataList = document.querySelector('[data-list-active]')
       dataList.style.display = 'block'
       const dataListBlurImg = document.querySelector('[data-list-blur]')
       const dataListImg = document.querySelector('[data-list-image]')
-      const dataListTile = document.querySelector('[data-list-title]')
-      dataListTile.focus()
+      const dataListTitle = document.querySelector('[data-list-title]')
+      dataListTitle.focus()
       const dataListSubTitle = document.querySelector('[data-list-subtitle]')
       const dataListDescription = document.querySelector('[data-list-description]')
       
@@ -209,12 +200,12 @@ for (const { author, image, title, id ,description ,published } of extracted  ) 
       const img = document.querySelector(`[data-image-${event.target.id}]`).getAttribute('src')
       dataListImg.setAttribute('src' , img)
 
-      dataListTile.innerHTML = document.querySelector(`[data-title-${event.target.id}]`).innerHTML
-      const year =  new Date (document.querySelector(`[data-published-${event.target.id}]`).innerHTML).getFullYear()
-      dataListSubTitle.innerHTML = `${year}`
+      dataListTitle.innerHTML = document.querySelector(`[data-title-${event.target.id}]`).innerHTML
+      const year =  (document.querySelector(`[data-published-${event.target.id}]`).innerHTML)
+      dataListSubTitle.innerHTML =year
       dataListDescription.innerHTML = document.querySelector(`[data-description-${event.target.id}]`).innerHTML
      
-    } )
+    } ) 
 }
 
 const data_list = document.querySelector('[data-list-items]')
@@ -283,35 +274,35 @@ const genresArr = Object.entries(genres);
 
 const searchForm = document.querySelector('[data-search-form]');
 
-searchForm.addEventListener('submit', event => {
-  event.preventDefault();
-  const formData = new FormData(searchForm);
-  const searchTitle = formData.get('title').toLowerCase();
-  const searchGenreKey = formData.get('genre');
-  const searchGenre = searchGenreKey === 'any' ? null : genres[searchGenreKey];
-  const searchAuthorKey = formData.get('author');
-  const searchAuthor = searchAuthorKey === 'any' ? null : authors[searchAuthorKey];
+    searchForm.addEventListener('submit', event => {
+      event.preventDefault();
+      const formData = new FormData(searchForm);
+      const searchTitle = formData.get('title').toLowerCase();
+      const searchGenreKey = formData.get('genre');
+      const searchGenre = searchGenreKey === 'any' ? 'All Genres' : genres[searchGenreKey];
+      const searchAuthorKey = formData.get('author');
+      const searchAuthor = searchAuthorKey === 'any' ? 'All Authors' : authors[searchAuthorKey];
 
-  const booksArr = Object.values(books);
-  const result = [];
+      const booksArr = Object.values(books);
+      const result = [];
 
-  for (let i = 0; i < booksArr.length; i++) {
-    const book = booksArr[i];
+      for (let i = 0; i < booksArr.length; i++) {
+        const book = booksArr[i];
 
-    // Check if book title includes search phrase
-    const titleMatch = searchTitle === '' || book.title.toLowerCase().includes(searchTitle);
+        // Check if book title includes search phrase
+        const titleMatch = searchTitle === '' || book.title.toLowerCase().includes(searchTitle);
 
-    // Check if book author matches selected author
-    const authorMatch = searchAuthor === 'All Authors' || authorsArr.some(author => authors[author] === book[author] || authors[author] === searchAuthor);
+        // Check if book author matches selected author
+        const authorMatch = searchAuthor === 'All Authors' || authorsArr.some(author => authors[author] === book[author] || authors[author] === searchAuthor);
 
-    // Check if book genre matches selected genre
-    const genreMatch = searchGenre === 'All Genres' || genresArr.some(genre => genres[genre] === book[genre] || genres[genre] === searchGenre);
+        // Check if book genre matches selected genre
+        const genreMatch = searchGenre === 'All Genres' || genresArr.some(genre => genres[genre] === book[genre] || genres[genre] === searchGenre);
 
-    if (titleMatch && authorMatch && genreMatch) {
-      result.push(book);
-    }
-   
-  }
+        if (titleMatch && authorMatch && genreMatch) {
+          result.push(book);
+        }
+      
+      }
 
   //Display search results
   const resultList = document.querySelector('[data-list-items]');
@@ -326,7 +317,8 @@ searchForm.addEventListener('submit', event => {
         <h2 class = "preview__title">${book.title}</h2>
         <p class = "preview__author">Author: ${authors[book.author]}</p>
         <p class = "preview__genre">Genre: ${genres[book.genres]}</p>
-      `;
+        <p class = "preview__popularity">Popularity: ${book.popularity}</p>
+      `;console.log(book.popularity)
       resultList.appendChild(bookElement);
     }
   } else {
@@ -334,4 +326,12 @@ searchForm.addEventListener('submit', event => {
   }
 
 });
+
+//These are error checks to ensure that the books array and the range array are present and valid.
+
+if (!books && !Array.isArray(books)) {
+  throw new Error('Source required')
+}  if (!range && range.length < 2){
+   throw new Error('Range must be an array with two numbers')
+}
 
