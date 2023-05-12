@@ -44,8 +44,7 @@ const toggleTheme = (event) => {
       dataSettingsOverlay.style.display = 'none';
     }
 
-   
-  };
+};
 
   const saveButton = document.querySelector("body > dialog:nth-child(5) > div > div > button.overlay__button.overlay__button_primary");
   saveButton.addEventListener('click', toggleTheme );
@@ -245,13 +244,10 @@ for (let [id2, name2] of Object.entries(authors)) {
 
 }
 
-
 const overlayFormAuthors = document.querySelector('[data-search-authors]')
 overlayFormAuthors.appendChild(authorsFragment)
 
 //----------------------------------------------------------------------------------//
-
-
 
 /**
  * This code is a search function that takes user input from a search form and
